@@ -1,0 +1,12 @@
+# Netlify build configuration for the Lead CRM (Next.js + Prisma + Postgres).
+# The @netlify/plugin-nextjs plugin is added automatically by Netlify.
+
+[build]
+  # Apply any pending DB migrations, generate the Prisma client, then build.
+  command = "npx prisma migrate deploy && npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Skip Prisma's version-update notice noise in CI
+  PRISMA_HIDE_UPDATE_MESSAGE = "true"

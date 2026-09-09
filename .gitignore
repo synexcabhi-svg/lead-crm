@@ -1,0 +1,21 @@
+node_modules
+.next
+.netlify
+dist
+out
+coverage
+
+# env / secrets
+.env
+.env.local
+.env.*.local
+
+# logs
+*.log
+npm-debug.log*
+
+# os / editor
+.DS_Store
+.idea
+*.tsbuildinfo
+next-env.d.ts

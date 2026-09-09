@@ -1,0 +1,343 @@
+// Lead Management System - single source of truth for all lead data.
+// Migrations: `npm run db:migrate`   Seed: `npm run db:seed`
+
+generator client {
+  provider      = "prisma-client-js"
+  // "native" for local dev; "rhel-openssl-3.0.x" for Netlify / AWS Lambda hosts
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Every person in the CRM. This is the single people list - it populates
+/// both the "Owner" and the "Sales Team" pickers. Login is by email/password.
+/// role: SUPER_ADMIN | ADMIN | MANAGER | SALES
+model User {
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  name               String
+  passwordHash       String
+  role               String   @default("SALES")
+  color              String   @default("#6b7280")
+  sortOrder          Int      @default(0)
+  isActive           Boolean  @default(true)
+  mustChangePassword Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  ownedLeads    Lead[]    @relation("LeadOwner")
+  ownedAccounts Account[] @relation("AccountOwner")
+  ownedContacts Contact[] @relation("ContactOwner")
+  ownedDeals    Deal[]    @relation("DealOwner")
+
+  // records where this person is the assigned Sales Team member
+  salesLeads    Lead[]     @relation("LeadSalesTeam")
+  salesAccounts Account[]  @relation("AccountSalesTeam")
+  salesContacts Contact[]  @relation("ContactSalesTeam")
+  salesDeals    Deal[]     @relation("DealSalesTeam")
+  territories   Territory[]
+
+  auditLogs AuditLog[]
+
+  @@index([role])
+  @@index([isActive])
+}
+
+/// Configurable lead status system. Logic reads flags from here -
+/// no status strings are hard-coded in the application.
+model LeadStatus {
+  key         String  @id // "new", "contacted", ...
+  label       String
+  sortOrder   Int     @default(0)
+  color       String  @default("#6b7280")
+  isDefault   Boolean @default(false) // status applied when none is supplied
+  isConverted Boolean @default(false) // counts towards conversion rate
+  isLost      Boolean @default(false) // terminal / negative outcome
+  isActive    Boolean @default(true)
+
+  leads Lead[]
+}
+
+/// Configurable lead source list (channels leads can arrive from).
+model LeadSource {
+  key      String  @id // "manual", "public_form", "website", "referral", ...
+  label    String
+  color    String  @default("#6b7280")
+  isActive Boolean @default(true)
+
+  leads Lead[]
+}
+
+
+/// A routing rule: leads whose location matches (country/state/city) are
+/// auto-assigned to this Sales Team member on creation. A member can have
+/// many; the most specific matching rule wins (city > state > country).
+model Territory {
+  id                String @id @default(cuid())
+  technicalMemberId String
+  technicalMember   User   @relation(fields: [technicalMemberId], references: [id], onDelete: Cascade)
+
+  country String?
+  state   String?
+  city    String?
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0) // tie-breaker when two rules score equally
+
+  createdAt DateTime @default(now())
+
+  @@index([technicalMemberId])
+  @@index([state])
+  @@index([city])
+  @@index([isActive])
+}
+
+/// THE lead table. Every lead - admin-created or public-form - lives here.
+model Lead {
+  id        String  @id @default(cuid())
+  firstName String
+  lastName  String?
+  email     String?
+  phone     String?
+  company   String?
+
+  sourceKey String
+  source    LeadSource @relation(fields: [sourceKey], references: [key])
+
+  statusKey String
+  status    LeadStatus @relation(fields: [statusKey], references: [key])
+
+  priority String @default("MEDIUM") // LOW | MEDIUM | HIGH | URGENT
+
+  ownerId String?
+  owner   User?   @relation("LeadOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  // Sales Team member handling the lead once assigned
+  technicalMemberId String?
+  technicalMember   User? @relation("LeadSalesTeam", fields: [technicalMemberId], references: [id], onDelete: SetNull)
+
+  notes   String?
+  message String? // free-text enquiry body (mainly from the public form)
+
+  // location - pre-filled on the public form from an IP lookup, user-editable
+  city       String?
+  state      String?
+  country    String?
+  postalCode String?
+
+  // intake / anti-abuse metadata
+  ipAddress String?
+  userAgent String?
+  consent   Boolean @default(false)
+
+  // duplicate handling
+  isDuplicate   Boolean @default(false)
+  duplicateOfId String?
+  duplicateOf   Lead?   @relation("LeadDuplicates", fields: [duplicateOfId], references: [id], onDelete: SetNull)
+  duplicates    Lead[]  @relation("LeadDuplicates")
+
+  isArchived Boolean @default(false)
+
+  // ---- conversion to a Deal (one-way, happens once) --------------------
+  convertedAt        DateTime?
+  convertedAccountId String?
+  convertedAccount   Account?  @relation("LeadConvertedAccount", fields: [convertedAccountId], references: [id], onDelete: SetNull)
+  convertedContactId String?
+  convertedContact   Contact?  @relation("LeadConvertedContact", fields: [convertedContactId], references: [id], onDelete: SetNull)
+  convertedDeal      Deal?     @relation("LeadConvertedDeal") // FK lives on Deal.sourceLeadId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auditLogs AuditLog[]
+
+  @@index([statusKey])
+  @@index([sourceKey])
+  @@index([ownerId])
+  @@index([technicalMemberId])
+  @@index([email])
+  @@index([phone])
+  @@index([createdAt])
+  @@index([isArchived])
+  @@index([isArchived, statusKey])
+  @@index([convertedAt])
+  @@index([state])
+  @@index([country])
+}
+
+/// A company / organisation. Created when a lead is converted (from its
+/// company name) or added directly. Contacts and deals hang off an account.
+model Account {
+  id        String   @id @default(cuid())
+  name      String
+  industry  String?
+  website   String?
+  phone     String?
+  notes     String?
+
+  // carried over from the lead on conversion
+  city       String?
+  state      String?
+  country    String?
+  postalCode String?
+
+  ownerId String?
+  owner   User?   @relation("AccountOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  technicalMemberId String?
+  technicalMember   User? @relation("AccountSalesTeam", fields: [technicalMemberId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contacts           Contact[]
+  deals              Deal[]
+  convertedFromLeads Lead[]    @relation("LeadConvertedAccount")
+
+  @@index([name])
+  @@index([ownerId])
+  @@index([technicalMemberId])
+  @@index([state])
+}
+
+/// A person at an account. The lead's person becomes a contact on conversion.
+model Contact {
+  id        String  @id @default(cuid())
+  firstName String
+  lastName  String?
+  email     String?
+  phone     String?
+  title     String?
+
+  // carried over from the lead on conversion
+  city       String?
+  state      String?
+  country    String?
+  postalCode String?
+
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  ownerId String?
+  owner   User?   @relation("ContactOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  technicalMemberId String?
+  technicalMember   User? @relation("ContactSalesTeam", fields: [technicalMemberId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  primaryForDeals    Deal[]        @relation("DealPrimaryContact")
+  dealLinks          DealContact[]
+  convertedFromLeads Lead[]        @relation("LeadConvertedContact")
+
+  @@index([accountId])
+  @@index([email])
+  @@index([technicalMemberId])
+}
+
+/// Contacts associated with a deal (buyer, co-applicant, agent, ...). The
+/// contact created when a lead is converted is linked here as the primary.
+model DealContact {
+  id        String   @id @default(cuid())
+  dealId    String
+  deal      Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  contactId String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  role      String? // "Primary" | "Buyer" | "Co-applicant" | "Agent" | ...
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@unique([dealId, contactId])
+  @@index([contactId])
+}
+
+/// Configurable deal pipeline stages (the Deal analogue of LeadStatus).
+model DealStage {
+  key         String  @id
+  label       String
+  sortOrder   Int     @default(0)
+  probability Int     @default(0) // 0-100, informational
+  isWon       Boolean @default(false)
+  isLost      Boolean @default(false)
+  isDefault   Boolean @default(false)
+  isActive    Boolean @default(true)
+
+  deals Deal[]
+}
+
+/// An opportunity / potential sale. Created from a converted lead or directly.
+model Deal {
+  id       String @id @default(cuid())
+  name     String
+  amount   Int? // whole currency units (reference build - no minor units)
+  currency String @default("INR")
+
+  stageKey String
+  stage    DealStage @relation(fields: [stageKey], references: [key])
+
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  primaryContactId String?
+  primaryContact   Contact? @relation("DealPrimaryContact", fields: [primaryContactId], references: [id], onDelete: SetNull)
+
+  ownerId String?
+  owner   User?   @relation("DealOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  technicalMemberId String?
+  technicalMember   User? @relation("DealSalesTeam", fields: [technicalMemberId], references: [id], onDelete: SetNull)
+
+  expectedCloseDate DateTime?
+  closedAt          DateTime?
+  notes             String?
+
+  // carried over from the lead on conversion
+  city       String?
+  state      String?
+  country    String?
+  postalCode String?
+
+  // set when the deal was produced by converting a lead
+  sourceLeadId String? @unique
+  sourceLead   Lead?   @relation("LeadConvertedDeal", fields: [sourceLeadId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  associatedContacts DealContact[]
+  auditLogs          AuditLog[]
+
+  @@index([stageKey])
+  @@index([accountId])
+  @@index([ownerId])
+  @@index([technicalMemberId])
+  @@index([expectedCloseDate])
+  @@index([createdAt])
+}
+
+/// Append-only audit trail for every meaningful lead operation.
+model AuditLog {
+  id         String   @id @default(cuid())
+  leadId     String?
+  lead       Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  dealId     String?
+  deal       Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  actorLabel String   @default("system") // "user:jane@x.com" | "public-form" | "system"
+  action     String // LEAD_* | DEAL_* | LEAD_CONVERTED
+  field      String?
+  oldValue   String?
+  newValue   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([leadId])
+  @@index([dealId])
+  @@index([action])
+  @@index([createdAt])
+}
