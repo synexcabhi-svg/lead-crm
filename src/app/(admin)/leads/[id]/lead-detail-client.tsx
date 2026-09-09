@@ -23,6 +23,7 @@ interface LeadDto {
   state: string | null;
   country: string | null;
   postalCode: string | null;
+  propertyTypeKey: string | null;
   priority: string;
   statusKey: string;
   sourceKey: string;
@@ -35,6 +36,7 @@ interface LeadDto {
   convertedAt: string | null;
   status: { label: string; color: string; isConverted?: boolean };
   source: { label: string; color: string };
+  propertyType: { key: string; label: string; category: string | null } | null;
   owner: { name: string; email: string } | null;
   technicalMember: { id: string; name: string; color: string } | null;
   duplicateOf: { id: string; firstName: string; lastName: string | null } | null;
@@ -174,6 +176,14 @@ export function LeadDetailClient({
               <dt className="muted">Source</dt>
               <dd style={{ margin: 0 }}>
                 <StatusBadge label={lead.source.label} color={lead.source.color} />
+              </dd>
+              <dt className="muted">Property type</dt>
+              <dd style={{ margin: 0 }}>
+                {lead.propertyType
+                  ? lead.propertyType.category
+                    ? `${lead.propertyType.category} — ${lead.propertyType.label}`
+                    : lead.propertyType.label
+                  : "-"}
               </dd>
               <dt className="muted">Owner</dt>
               <dd style={{ margin: 0 }}>

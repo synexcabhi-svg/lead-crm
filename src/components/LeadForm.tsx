@@ -21,6 +21,7 @@ export interface LeadFormMeta {
   sources: { key: string; label: string; color?: string }[];
   owners: { id: string; name: string; color?: string }[];
   technicalMembers: { id: string; name: string; color?: string }[];
+  propertyTypes?: { key: string; label: string; category?: string | null }[];
   priorities?: readonly string[];
 }
 
@@ -37,6 +38,7 @@ export interface LeadInitial {
   state?: string | null;
   country?: string | null;
   postalCode?: string | null;
+  propertyTypeKey?: string | null;
   priority?: string;
   statusKey?: string;
   sourceKey?: string;
@@ -70,6 +72,7 @@ export function LeadForm({
     state: initial?.state ?? "",
     country: initial?.country ?? "",
     postalCode: initial?.postalCode ?? "",
+    propertyTypeKey: initial?.propertyTypeKey ?? "",
     priority: initial?.priority ?? "MEDIUM",
     statusKey: initial?.statusKey ?? "",
     sourceKey: initial?.sourceKey ?? "",
@@ -239,6 +242,25 @@ export function LeadForm({
               </select>
             </Field>
           </div>
+          <Field
+            label="Property type"
+            htmlFor="propertyTypeKey"
+            hint="What kind of property this lead is interested in"
+          >
+            <select
+              id="propertyTypeKey"
+              className="select"
+              value={form.propertyTypeKey}
+              onChange={set("propertyTypeKey")}
+            >
+              <option value="">Not specified</option>
+              {(meta.propertyTypes ?? []).map((p) => (
+                <option key={p.key} value={p.key}>
+                  {p.category ? `${p.category} — ${p.label}` : p.label}
+                </option>
+              ))}
+            </select>
+          </Field>
           <div className="row">
             <Field label="Source" htmlFor="sourceKey">
               <ColorSelect

@@ -26,6 +26,7 @@ const phone = z
 const company = z.string().trim().max(120, "Too long (max 120)").optional().or(z.literal(""));
 const longText = z.string().trim().max(2000, "Too long (max 2000)").optional().or(z.literal(""));
 const place = z.string().trim().max(80, "Too long (max 80)").optional().or(z.literal(""));
+const propertyTypeKey = z.string().trim().min(1).max(40).optional().or(z.literal(""));
 
 /** city / state / country / postalCode - present on every lead schema. */
 const locationFields = {
@@ -56,6 +57,7 @@ export const leadAdminSchema = z
     message: longText,
     notes: longText,
     ...locationFields,
+    propertyTypeKey,
     priority: z.enum(LEAD_PRIORITIES).optional(),
     statusKey: z.string().trim().min(1).max(40).optional(),
     sourceKey: z.string().trim().min(1).max(40).optional(),
@@ -77,6 +79,7 @@ export const leadUpdateSchema = z
     message: longText,
     notes: longText,
     ...locationFields,
+    propertyTypeKey,
     priority: z.enum(LEAD_PRIORITIES).optional(),
     statusKey: z.string().trim().min(1).max(40).optional(),
     sourceKey: z.string().trim().min(1).max(40).optional(),
@@ -98,6 +101,7 @@ export const leadPublicSchema = z
     company,
     message: longText,
     ...locationFields,
+    propertyTypeKey,
     consent: z.coerce.boolean().optional(),
     // honeypot: real users never fill this hidden field
     website: z.string().max(0, "spam").optional().or(z.literal("")),
@@ -115,6 +119,7 @@ export const leadListQuerySchema = z.object({
   source: z.string().trim().optional(),
   owner: z.string().trim().optional(),
   tech: z.string().trim().optional(),
+  propertyType: z.string().trim().optional(),
   state: z.string().trim().optional(),
   priority: z.string().trim().optional(),
   archived: z.enum(["true", "false", "all"]).default("false"),

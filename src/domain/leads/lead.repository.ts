@@ -12,6 +12,7 @@ export const leadDetailInclude = {
   source: true,
   owner: { select: { id: true, name: true, email: true } },
   technicalMember: { select: { id: true, name: true, color: true } },
+  propertyType: { select: { key: true, label: true, category: true } },
   duplicateOf: { select: { id: true, firstName: true, lastName: true, email: true } },
   convertedAccount: { select: { id: true, name: true } },
   convertedContact: { select: { id: true, firstName: true, lastName: true } },
@@ -56,6 +57,9 @@ function buildWhere(q: LeadListQuery): Prisma.LeadWhereInput {
   if (q.priority) where.priority = q.priority;
   if (q.owner) where.ownerId = q.owner === "unassigned" ? null : q.owner;
   if (q.tech) where.technicalMemberId = q.tech === "unassigned" ? null : q.tech;
+  if (q.propertyType) {
+    where.propertyTypeKey = q.propertyType === "unassigned" ? null : q.propertyType;
+  }
   if (q.state) where.state = { equals: q.state, mode: "insensitive" };
 
   if (q.q) {

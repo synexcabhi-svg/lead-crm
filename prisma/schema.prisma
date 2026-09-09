@@ -73,6 +73,19 @@ model LeadSource {
   leads Lead[]
 }
 
+/// Configurable list of property types a lead is interested in
+/// (apartment, villa, plot, commercial shop, ...). Later this can grow into a
+/// property / product master used for quotations and sales orders.
+model PropertyType {
+  key       String  @id // "apartment", "villa", "plot", "commercial_shop", ...
+  label     String
+  category  String? // "Residential" | "Commercial" | "Land"
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  leads Lead[]
+}
+
 
 /// A routing rule: leads whose location matches (country/state/city) are
 /// auto-assigned to this Sales Team member on creation. A member can have
@@ -111,6 +124,10 @@ model Lead {
 
   statusKey String
   status    LeadStatus @relation(fields: [statusKey], references: [key])
+
+  // what kind of property the lead is interested in
+  propertyTypeKey String?
+  propertyType    PropertyType? @relation(fields: [propertyTypeKey], references: [key], onDelete: SetNull)
 
   priority String @default("MEDIUM") // LOW | MEDIUM | HIGH | URGENT
 
@@ -159,6 +176,7 @@ model Lead {
 
   @@index([statusKey])
   @@index([sourceKey])
+  @@index([propertyTypeKey])
   @@index([ownerId])
   @@index([technicalMemberId])
   @@index([email])

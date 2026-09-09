@@ -31,6 +31,21 @@ const SOURCES = [
   { key: "other", label: "Other", color: "#64748b" },
 ];
 
+const PROPERTY_TYPES = [
+  { key: "apartment", label: "Apartment / Flat", category: "Residential", sortOrder: 10 },
+  { key: "builder_floor", label: "Builder Floor", category: "Residential", sortOrder: 20 },
+  { key: "villa", label: "Villa", category: "Residential", sortOrder: 30 },
+  { key: "independent_house", label: "Independent House", category: "Residential", sortOrder: 40 },
+  { key: "penthouse", label: "Penthouse", category: "Residential", sortOrder: 50 },
+  { key: "studio", label: "Studio Apartment", category: "Residential", sortOrder: 60 },
+  { key: "plot", label: "Plot / Land", category: "Land", sortOrder: 70 },
+  { key: "agricultural_land", label: "Agricultural Land", category: "Land", sortOrder: 80 },
+  { key: "farmhouse", label: "Farmhouse", category: "Land", sortOrder: 90 },
+  { key: "commercial_office", label: "Commercial Office", category: "Commercial", sortOrder: 100 },
+  { key: "commercial_shop", label: "Commercial Shop / Retail", category: "Commercial", sortOrder: 110 },
+  { key: "warehouse", label: "Warehouse / Industrial", category: "Commercial", sortOrder: 120 },
+];
+
 const DEAL_STAGES = [
   { key: "qualification", label: "Qualification", sortOrder: 10, probability: 10, isDefault: true },
   { key: "needs_analysis", label: "Needs Analysis", sortOrder: 20, probability: 25 },
@@ -110,6 +125,7 @@ async function main() {
   for (const s of STATUSES) await prisma.leadStatus.upsert({ where: { key: s.key }, update: s, create: s });
   for (const s of SOURCES) await prisma.leadSource.upsert({ where: { key: s.key }, update: s, create: s });
   for (const s of DEAL_STAGES) await prisma.dealStage.upsert({ where: { key: s.key }, update: s, create: s });
+  for (const s of PROPERTY_TYPES) await prisma.propertyType.upsert({ where: { key: s.key }, update: s, create: s });
 
   console.log("Seeding people (Abhishek Jha = Super Admin, Akash Adlakha = Admin, rest = Sales)...");
   const userIdByName = new Map<string, string>();

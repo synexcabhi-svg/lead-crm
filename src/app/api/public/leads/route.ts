@@ -59,6 +59,7 @@ export async function POST(req: Request) {
         state: input.state || undefined,
         country: input.country || undefined,
         postalCode: input.postalCode || undefined,
+        propertyTypeKey: input.propertyTypeKey || undefined,
         consent: Boolean(input.consent),
         ipAddress: ip,
         userAgent: req.headers.get("user-agent") ?? undefined,

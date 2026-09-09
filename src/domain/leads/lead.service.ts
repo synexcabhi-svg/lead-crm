@@ -31,6 +31,7 @@ import {
   getStatuses,
 } from "@/domain/statuses/status.service";
 import { assertTechnicalMember } from "@/domain/team/team.service";
+import { assertPropertyTypeKey } from "@/domain/property/property-type.service";
 import { resolveTechnicalMemberForLocation } from "@/domain/team/territory.service";
 import {
   AUDIT_ACTIONS,
@@ -56,6 +57,7 @@ export interface CreateLeadInput {
   state?: string;
   country?: string;
   postalCode?: string;
+  propertyTypeKey?: string;
   priority?: LeadPriority;
   statusKey?: string;
   sourceKey?: string;
@@ -78,6 +80,7 @@ export interface UpdateLeadInput {
   state?: string;
   country?: string;
   postalCode?: string;
+  propertyTypeKey?: string;
   priority?: LeadPriority;
   statusKey?: string;
   sourceKey?: string;
@@ -122,6 +125,9 @@ export async function createLead(
     clean(input.ownerId) ??
     (ctx.origin === "admin" && ctx.actor.kind === "user" ? ctx.actor.userId : null);
   if (ownerId) await assertOwner(ownerId);
+
+  const propertyTypeKey = clean(input.propertyTypeKey);
+  if (propertyTypeKey) await assertPropertyTypeKey(propertyTypeKey);
 
   const city = clean(input.city);
   const state = clean(input.state);
@@ -172,6 +178,7 @@ export async function createLead(
     state,
     country,
     postalCode: clean(input.postalCode),
+    propertyTypeKey: propertyTypeKey ?? null,
     priority: input.priority ?? DEFAULT_PRIORITY,
     statusKey,
     sourceKey,
@@ -282,6 +289,7 @@ export async function updateLead(
   if (input.sourceKey && input.sourceKey !== current.sourceKey) await assertSourceKey(input.sourceKey);
   if (input.ownerId) await assertOwner(input.ownerId);
   if (input.technicalMemberId) await assertTechnicalMember(input.technicalMemberId);
+  if (input.propertyTypeKey) await assertPropertyTypeKey(input.propertyTypeKey);
 
   const data: Record<string, unknown> = {};
   const audits: AuditEntry[] = [];
@@ -316,6 +324,7 @@ export async function updateLead(
     "state",
     "country",
     "postalCode",
+    "propertyTypeKey",
     "priority",
     "statusKey",
     "sourceKey",

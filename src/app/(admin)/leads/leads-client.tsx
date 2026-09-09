@@ -17,6 +17,7 @@ interface Meta {
   sources: { key: string; label: string; color?: string }[];
   owners: { id: string; name: string; color?: string }[];
   technicalMembers: { id: string; name: string; color?: string }[];
+  propertyTypes: { key: string; label: string; category?: string | null }[];
 }
 interface Perms {
   reassignOwner: boolean;
@@ -150,6 +151,19 @@ export function LeadsClient({
               ...meta.technicalMembers.map((m) => ({ value: m.id, label: m.name, color: m.color })),
             ]}
           />
+          <select
+            className="select"
+            value={query.propertyType ?? "all"}
+            onChange={(e) => pushQuery({ propertyType: e.target.value })}
+          >
+            <option value="all">All property types</option>
+            <option value="unassigned">Not specified</option>
+            {meta.propertyTypes.map((p) => (
+              <option key={p.key} value={p.key}>
+                {p.category ? `${p.category} — ${p.label}` : p.label}
+              </option>
+            ))}
+          </select>
           <select className="select" value={query.archived} onChange={(e) => pushQuery({ archived: e.target.value })}>
             <option value="false">Active</option>
             <option value="true">Archived</option>
@@ -175,6 +189,7 @@ export function LeadsClient({
               <th>Phone</th>
               <th onClick={() => toggleSort("company")}>Company{sortMark("company")}</th>
               <th>Location</th>
+              <th>Property</th>
               <th>Source</th>
               <th onClick={() => toggleSort("statusKey")}>Status{sortMark("statusKey")}</th>
               <th onClick={() => toggleSort("priority")}>Priority{sortMark("priority")}</th>
@@ -197,6 +212,7 @@ export function LeadsClient({
                 <td>{l.phone ?? "-"}</td>
                 <td>{l.company ?? "-"}</td>
                 <td>{[l.city, l.state].filter(Boolean).join(", ") || "-"}</td>
+                <td>{l.propertyType?.label ?? "-"}</td>
                 <td>
                   <ColorTag label={l.source.label} color={l.source.color} />
                 </td>
@@ -255,7 +271,7 @@ export function LeadsClient({
             ))}
             {items.length === 0 ? (
               <tr>
-                <td colSpan={12} className="muted">
+                <td colSpan={13} className="muted">
                   No leads match these filters.
                 </td>
               </tr>
