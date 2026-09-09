@@ -40,6 +40,7 @@ model User {
   salesContacts Contact[]  @relation("ContactSalesTeam")
   salesDeals    Deal[]     @relation("DealSalesTeam")
   territories   Territory[]
+  loggedCalls   Call[]     @relation("CallOwner")
 
   auditLogs AuditLog[]
 
@@ -154,6 +155,7 @@ model Lead {
   updatedAt DateTime @updatedAt
 
   auditLogs AuditLog[]
+  calls     Call[]
 
   @@index([statusKey])
   @@index([sourceKey])
@@ -341,4 +343,27 @@ model AuditLog {
   @@index([dealId])
   @@index([action])
   @@index([createdAt])
+}
+
+/// A logged phone call against a lead - the "Calls" related list on a lead,
+/// modelled after the Zoho CRM Calls module. Data is stored with the lead
+/// (leadId) and shown in the lead's Calls list.
+model Call {
+  id              String   @id @default(cuid())
+  leadId          String
+  lead            Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  subject         String
+  callType        String   @default("outbound") // inbound | outbound | missed
+  purpose         String? // Prospecting | Follow-up | Demo | Negotiation | Administrative | Other
+  outcome         String? // Connected | No answer | Left voicemail | Callback requested | Interested | Not interested
+  callTime        DateTime @default(now())
+  durationMinutes Int?
+  notes           String?
+  ownerId         String?
+  owner           User?    @relation("CallOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([leadId])
+  @@index([callTime])
 }

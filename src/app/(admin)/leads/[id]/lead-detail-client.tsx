@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/client";
 import { LeadForm, type LeadFormMeta } from "@/components/LeadForm";
 import { ConvertLeadPanel, type ConvertMeta } from "@/components/ConvertLeadPanel";
+import { CallsPanel } from "@/components/CallsPanel";
 import { StatusBadge, PriorityPill } from "@/components/StatusBadge";
 import { Toast } from "@/components/ui";
 
@@ -51,15 +52,28 @@ interface AuditDto {
   createdAt: string;
   user: { name: string } | null;
 }
+interface CallDto {
+  id: string;
+  subject: string;
+  callType: string;
+  purpose: string | null;
+  outcome: string | null;
+  callTime: string;
+  durationMinutes: number | null;
+  notes: string | null;
+  owner: { id: string; name: string } | null;
+}
 
 export function LeadDetailClient({
   lead,
   audit,
+  calls,
   meta,
   perms,
 }: {
   lead: LeadDto;
   audit: AuditDto[];
+  calls: CallDto[];
   meta: LeadFormMeta & ConvertMeta;
   perms: { hardDeleteLead: boolean; reassignOwner: boolean };
 }) {
@@ -222,6 +236,8 @@ export function LeadDetailClient({
           </div>
         </div>
       </div>
+
+      <CallsPanel leadId={lead.id} initial={calls} />
 
       {toast ? <Toast message={toast.msg} kind={toast.kind} onDone={() => setToast(null)} /> : null}
     </>
