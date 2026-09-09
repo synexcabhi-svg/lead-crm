@@ -1,4 +1,4 @@
-﻿-- DropForeignKey
+-- DropForeignKey
 ALTER TABLE "Account" DROP CONSTRAINT "Account_technicalMemberId_fkey";
 
 -- DropForeignKey
@@ -39,4 +39,3 @@ ALTER TABLE "Contact" ADD CONSTRAINT "Contact_technicalMemberId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "Deal" ADD CONSTRAINT "Deal_technicalMemberId_fkey" FOREIGN KEY ("technicalMemberId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
