@@ -440,6 +440,66 @@ table.data td.wrap {
   gap: 8px;
   font-size: 0.85rem;
 }
+
+/* clickable user chip + dropdown menu in the header */
+.user-menu {
+  position: relative;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+  border-radius: 999px;
+  padding: 5px 12px 5px 6px;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+}
+.user-chip:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+.user-chip-text {
+  line-height: 1.2;
+}
+.user-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  z-index: 40;
+}
+.user-pop-head {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.user-pop-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  background: none;
+  border: none;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+.user-pop-item:hover {
+  background: var(--bg);
+  text-decoration: none;
+}
+.user-pop-item.danger {
+  color: var(--danger);
+}
 .who-dot {
   width: 28px;
   height: 28px;

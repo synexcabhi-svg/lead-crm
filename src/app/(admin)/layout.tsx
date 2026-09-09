@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { can, ROLE_LABELS, isRole } from "@/lib/rbac";
 import { ThemeControl } from "@/components/ThemeControl";
-import { LogoutButton, NavLink } from "./nav";
+import { UserMenu } from "@/components/UserMenu";
+import { NavLink } from "./nav";
 
 export const dynamic = "force-dynamic";
 
@@ -11,14 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user) redirect("/login");
   if (user.mustChangePassword) redirect("/change-password");
 
-  const color = user.color;
   const roleLabel = isRole(user.role) ? ROLE_LABELS[user.role] : user.role;
-  const initials = user.name
-    .split(/\s+/)
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
 
   return (
     <div className="app-shell">
@@ -35,21 +29,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           Public form &#8599;
         </a>
         <div className="spacer" />
-        <LogoutButton />
       </nav>
       <main className="main">
         <header className="app-header">
           <ThemeControl />
-          <div className="who">
-            <span className="who-dot" style={{ background: color }}>
-              {initials}
-            </span>
-            <span>
-              <b>{user.name}</b> <span className="muted">· {roleLabel}</span>
-              <br />
-              <span className="muted" style={{ fontSize: "0.75rem" }}>{user.email}</span>
-            </span>
-          </div>
+          <UserMenu name={user.name} email={user.email} role={roleLabel} color={user.color} />
         </header>
         {children}
       </main>
