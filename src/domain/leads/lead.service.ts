@@ -331,6 +331,8 @@ export async function updateLead(
   ];
   for (const f of strFields) {
     if (input[f] === undefined) continue;
+    // statusKey / sourceKey are required FKs - an empty value means "leave unchanged"
+    if ((f === "statusKey" || f === "sourceKey") && !clean(input[f] as string | undefined)) continue;
     const next = f === "priority" ? (input[f] as string) : clean(input[f] as string | undefined);
     const normNext = f === "email" ? next?.toLowerCase() ?? null : next;
     if ((current as Record<string, unknown>)[f] !== normNext) {
