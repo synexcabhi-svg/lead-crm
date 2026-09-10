@@ -16,7 +16,7 @@ export default async function NewDealPage() {
   return (
     <>
       <div className="topbar">
-        <h1>New Deal</h1>
+        <h1>New Opportunity</h1>
       </div>
       <div className="card" style={{ maxWidth: 620 }}>
         <NewDealClient

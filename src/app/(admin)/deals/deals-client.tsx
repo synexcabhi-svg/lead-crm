@@ -67,10 +67,10 @@ export function DealsClient({
     <>
       <div className="topbar">
         <h1>
-          Deals <span className="muted" style={{ fontWeight: 400 }}>({total} · {money(totalAmount)})</span>
+          Opportunities <span className="muted" style={{ fontWeight: 400 }}>({total} · {money(totalAmount)})</span>
         </h1>
         <Link className="btn primary sm" href="/deals/new">
-          + New Deal
+          + New Opportunity
         </Link>
       </div>
 
@@ -82,7 +82,7 @@ export function DealsClient({
               pushQuery({ q });
             }}
           >
-            <input className="input" placeholder="Search deal or account" value={q} onChange={(e) => setQ(e.target.value)} />
+            <input className="input" placeholder="Search opportunity or account" value={q} onChange={(e) => setQ(e.target.value)} />
           </form>
           <select className="select" value={query.stage ?? "all"} onChange={(e) => pushQuery({ stage: e.target.value })}>
             <option value="all">All stages</option>
@@ -130,7 +130,7 @@ export function DealsClient({
         <table className="data">
           <thead>
             <tr>
-              <th>Deal</th>
+              <th>Opportunity</th>
               <th>Account</th>
               <th>Amount</th>
               <th>Stage</th>
@@ -196,7 +196,7 @@ export function DealsClient({
             {items.length === 0 ? (
               <tr>
                 <td colSpan={8} className="muted">
-                  No deals match these filters.
+                  No opportunities match these filters.
                 </td>
               </tr>
             ) : null}

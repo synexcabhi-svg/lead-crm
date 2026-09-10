@@ -78,7 +78,7 @@ export function PeopleClient({ initial, meId }: { initial: Person[]; meId: strin
     <>
       <div className="topbar">
         <div>
-          <h1 style={{ marginBottom: 2 }}>People &amp; Roles</h1>
+          <h1 style={{ marginBottom: 2 }}>Team &amp; Roles</h1>
           <span className="muted">
             This list is the Owner and Sales Team pickers. Roles: Super Admin &gt; Admin &gt; Manager &gt; Sales.
           </span>

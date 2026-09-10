@@ -104,7 +104,7 @@ export function AccountsClient({ initial, q }: { initial: Result; q: string }) {
               <th>Owner</th>
               <th>Sales Team</th>
               <th>Contacts</th>
-              <th>Deals</th>
+              <th>Opportunities</th>
             </tr>
           </thead>
           <tbody>

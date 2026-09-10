@@ -55,7 +55,7 @@ export function NewDealClient({ meta }: { meta: Meta }) {
       if (e2 instanceof ApiClientError) {
         setErr(e2.message);
         setErrs(fieldErrors(e2.details));
-      } else setErr("Failed to create deal");
+      } else setErr("Failed to create opportunity");
       setBusy(false);
     }
   }
@@ -67,7 +67,7 @@ export function NewDealClient({ meta }: { meta: Meta }) {
   return (
     <form onSubmit={submit} noValidate>
       {err ? <p className="err">{err}</p> : null}
-      <Field label="Deal name" error={errs.name}>
+      <Field label="Opportunity name" error={errs.name}>
         <input className="input" value={form.name} onChange={(e) => set("name", e.target.value)} required />
       </Field>
       <Field label="Account" error={errs.accountId}>
@@ -128,7 +128,7 @@ export function NewDealClient({ meta }: { meta: Meta }) {
         <textarea className="textarea" value={form.notes} onChange={(e) => set("notes", e.target.value)} />
       </Field>
       <button className="btn primary" disabled={busy}>
-        {busy ? "Creating…" : "Create deal"}
+        {busy ? "Creating…" : "Create opportunity"}
       </button>
     </form>
   );

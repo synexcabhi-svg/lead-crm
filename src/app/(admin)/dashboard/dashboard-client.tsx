@@ -145,7 +145,7 @@ export function DashboardClient({ initial }: { initial: Everything }) {
           />
         </ChartCard>
         <ChartCard
-          title="Deal pipeline"
+          title="Opportunity pipeline"
           total={`Win rate ${pipeline.winRate}%`}
         >
           <p className="sub" style={{ marginTop: -4 }}>
@@ -153,7 +153,7 @@ export function DashboardClient({ initial }: { initial: Everything }) {
           </p>
           <BarList
             items={pipeline.perStage.map((s) => ({ label: `${s.label} (${s.count})`, count: s.amount }))}
-            empty="No deals yet"
+            empty="No opportunities yet"
           />
         </ChartCard>
       </div>

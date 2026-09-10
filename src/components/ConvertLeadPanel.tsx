@@ -78,14 +78,14 @@ export function ConvertLeadPanel({ lead, meta }: { lead: LeadForConvert; meta: C
               ? `${lead.convertedContact.firstName} ${lead.convertedContact.lastName ?? ""}`.trim()
               : "—"}
           </dd>
-          <dt className="muted">Deal</dt>
+          <dt className="muted">Opportunity</dt>
           <dd style={{ margin: 0 }}>
             {lead.convertedDeal ? (
               <Link href={`/deals/${lead.convertedDeal.id}`}>
                 {lead.convertedDeal.name} · {money(lead.convertedDeal.amount, lead.convertedDeal.currency)}
               </Link>
             ) : (
-              "no deal created"
+              "no opportunity created"
             )}
           </dd>
         </dl>
@@ -97,10 +97,10 @@ export function ConvertLeadPanel({ lead, meta }: { lead: LeadForConvert; meta: C
   if (!lead.status.isConverted) {
     return (
       <div className="card">
-        <h2>Convert to deal</h2>
+        <h2>Convert to opportunity</h2>
         <p className="muted">
           Set this lead&apos;s status to a <b>converted</b> status (e.g. &quot;Converted&quot;) to
-          turn it into an account &amp; deal.
+          turn it into an account &amp; opportunity.
         </p>
       </div>
     );
@@ -144,7 +144,7 @@ export function ConvertLeadPanel({ lead, meta }: { lead: LeadForConvert; meta: C
       {!open ? (
         <>
           <p className="muted">
-            Create an Account, a Contact and (optionally) a Deal from this lead.
+            Create an Account, a Contact and (optionally) an Opportunity from this lead.
           </p>
           <button className="btn primary" onClick={() => setOpen(true)}>
             Convert this lead
@@ -203,12 +203,12 @@ export function ConvertLeadPanel({ lead, meta }: { lead: LeadForConvert; meta: C
               checked={form.createDeal}
               onChange={(e) => set("createDeal", e.target.checked)}
             />
-            <span>Also create a deal</span>
+            <span>Also create an opportunity</span>
           </label>
 
           {form.createDeal ? (
             <>
-              <Field label="Deal name" error={errs.dealName}>
+              <Field label="Opportunity name" error={errs.dealName}>
                 <input
                   className="input"
                   value={form.dealName}

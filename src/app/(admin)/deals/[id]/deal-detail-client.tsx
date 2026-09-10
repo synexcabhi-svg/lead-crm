@@ -102,7 +102,7 @@ export function DealDetailClient({
       setAddContactId("");
       setAddRole("");
       router.refresh();
-      setToast({ msg: "Contact linked to deal", kind: "info" });
+      setToast({ msg: "Contact linked to opportunity", kind: "info" });
     } catch (e) {
       setToast({ msg: e instanceof ApiClientError ? e.message : "Failed", kind: "error" });
     }
@@ -139,7 +139,7 @@ export function DealDetailClient({
       });
       setEditing(false);
       router.refresh();
-      setToast({ msg: "Deal updated", kind: "info" });
+      setToast({ msg: "Opportunity updated", kind: "info" });
     } catch (e2) {
       setToast({ msg: e2 instanceof ApiClientError ? e2.message : "Update failed", kind: "error" });
     } finally {
@@ -148,7 +148,7 @@ export function DealDetailClient({
   }
 
   async function remove() {
-    if (!confirm("Delete this deal?")) return;
+    if (!confirm("Delete this opportunity?")) return;
     try {
       await api(`/api/deals/${deal.id}`, { method: "DELETE" });
       router.push("/deals");
@@ -164,7 +164,7 @@ export function DealDetailClient({
         <div>
           <h1 style={{ marginBottom: 2 }}>{deal.name}</h1>
           <span className="muted">
-            <Link href="/deals">Deals</Link> / <Link href={`/accounts/${deal.account.id}`}>{deal.account.name}</Link>
+            <Link href="/deals">Opportunities</Link> / <Link href={`/accounts/${deal.account.id}`}>{deal.account.name}</Link>
           </span>
         </div>
         <div className="row" style={{ flex: "unset", gap: 8 }}>
@@ -392,7 +392,7 @@ export function DealDetailClient({
               {deal.associatedContacts.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="muted">
-                    No contacts linked to this deal yet.
+                    No contacts linked to this opportunity yet.
                   </td>
                 </tr>
               ) : null}

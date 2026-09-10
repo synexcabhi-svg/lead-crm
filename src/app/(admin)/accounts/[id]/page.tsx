@@ -20,7 +20,7 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
           </span>
         </div>
         <Link className="btn primary sm" href="/deals/new">
-          + New Deal
+          + New Opportunity
         </Link>
       </div>
 
@@ -79,7 +79,7 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
       </div>
 
       <div className="card" style={{ marginTop: 14 }}>
-        <h2>Deals ({account.deals.length})</h2>
+        <h2>Opportunities ({account.deals.length})</h2>
         <div className="table-wrap">
           <table className="data">
             <thead>
@@ -105,7 +105,7 @@ export default async function AccountDetailPage({ params }: { params: { id: stri
               {account.deals.length === 0 ? (
                 <tr>
                   <td colSpan={3} className="muted">
-                    No deals yet.
+                    No opportunities yet.
                   </td>
                 </tr>
               ) : null}

@@ -21,10 +21,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <NavLink href="/dashboard">Dashboard</NavLink>
         <NavLink href="/leads">Leads</NavLink>
         <NavLink href="/leads/new">Add Lead</NavLink>
-        <NavLink href="/deals">Deals</NavLink>
+        <NavLink href="/deals">Opportunities</NavLink>
         <NavLink href="/accounts">Accounts</NavLink>
         {can.manageTerritories(user) ? <NavLink href="/territories">Territories</NavLink> : null}
-        {can.managePeople(user) ? <NavLink href="/people">People &amp; Roles</NavLink> : null}
+        {can.managePeople(user) ? <NavLink href="/people">Team &amp; Roles</NavLink> : null}
         <a href="https://tranquil-snickerdoodle-3aea9c.netlify.app/" target="_blank" rel="noreferrer">
           Public form &#8599;
         </a>
