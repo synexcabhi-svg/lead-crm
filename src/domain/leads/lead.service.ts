@@ -101,6 +101,20 @@ async function assertOwner(ownerId: string): Promise<void> {
   if (!owner) throw badRequest(`Unknown or inactive owner: ${ownerId}`, { field: "ownerId" });
 }
 
+/**
+ * Fallback owner for leads that arrive without one (e.g. the public website
+ * form): the earliest active Super Admin. Returns null only if no active
+ * Super Admin exists, in which case the lead stays unassigned as before.
+ */
+async function resolveDefaultOwnerId(): Promise<string | null> {
+  const admin = await prisma.user.findFirst({
+    where: { role: "SUPER_ADMIN", isActive: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    select: { id: true },
+  });
+  return admin?.id ?? null;
+}
+
 /* -------------------------------------------------------------------------- */
 /*  CREATE                                                                     */
 /* -------------------------------------------------------------------------- */
@@ -119,11 +133,13 @@ export async function createLead(
   const statusKey = clean(input.statusKey) ?? (await getDefaultStatusKey());
   await assertStatusKey(statusKey);
 
-  // Owner defaults to the person creating the lead (admin UI); public-form
-  // leads have no creator so they start unassigned.
+  // Owner defaults to the person creating the lead (admin UI). Leads with no
+  // creator (public-form submissions, integrations) fall back to the Super
+  // Admin so every lead is owned by someone.
   const ownerId =
     clean(input.ownerId) ??
-    (ctx.origin === "admin" && ctx.actor.kind === "user" ? ctx.actor.userId : null);
+    (ctx.origin === "admin" && ctx.actor.kind === "user" ? ctx.actor.userId : null) ??
+    (await resolveDefaultOwnerId());
   if (ownerId) await assertOwner(ownerId);
 
   const propertyTypeKey = clean(input.propertyTypeKey);
