@@ -25,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <NavLink href="/accounts">Accounts</NavLink>
         {can.manageTerritories(user) ? <NavLink href="/territories">Territories</NavLink> : null}
         {can.managePeople(user) ? <NavLink href="/people">People &amp; Roles</NavLink> : null}
-        <a href="/public/lead-form" target="_blank" rel="noreferrer">
+        <a href="https://tranquil-snickerdoodle-3aea9c.netlify.app/" target="_blank" rel="noreferrer">
           Public form &#8599;
         </a>
         <div className="spacer" />
