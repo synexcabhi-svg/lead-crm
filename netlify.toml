@@ -10,3 +10,7 @@
   NODE_VERSION = "20"
   # Skip Prisma's version-update notice noise in CI
   PRISMA_HIDE_UPDATE_MESSAGE = "true"
+  
+[functions]
+  external_node_modules = ["@prisma/client", ".prisma/client"]
+  node_bundler = "esbuild"
