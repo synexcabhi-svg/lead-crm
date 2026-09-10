@@ -153,6 +153,24 @@ h2 {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
+.kpi {
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.kpi::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--kpi-accent, var(--border));
+}
+.kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 24, 40, 0.1);
+}
 .kpi .label {
   color: var(--text-muted);
   font-size: 0.8rem;
@@ -162,11 +180,42 @@ h2 {
   font-size: 1.7rem;
   font-weight: 700;
   margin-top: 4px;
+  font-variant-numeric: tabular-nums;
 }
 .kpi .sub {
   color: var(--text-muted);
   font-size: 0.78rem;
   margin-top: 2px;
+}
+
+.dash-section {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 22px 0 10px;
+}
+.dash-section:first-of-type {
+  margin-top: 0;
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.card-head h2 {
+  margin: 0;
+}
+.card-head .total {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .btn {
@@ -328,30 +377,44 @@ table.data td.wrap {
 .bar-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 .bar-row {
   display: grid;
-  grid-template-columns: 120px 1fr 44px;
+  grid-template-columns: minmax(80px, 120px) 1fr auto;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-size: 0.82rem;
+}
+.bar-row .bar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .bar-track {
   background: var(--bg);
-  border-radius: 6px;
-  height: 10px;
+  border-radius: 999px;
+  height: 12px;
   overflow: hidden;
 }
 .bar-fill {
+  display: block;
   height: 100%;
+  min-width: 3px;
   background: var(--primary);
-  border-radius: 6px;
+  border-radius: 999px;
+  transition: width 0.4s ease;
 }
 .bar-row .num {
   text-align: right;
-  color: var(--text-muted);
+  color: var(--text);
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+.bar-row .num .pct {
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-left: 5px;
 }
 
 .pagination {
